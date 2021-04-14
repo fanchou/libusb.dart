@@ -17,7 +17,6 @@ class Libusb {
   /// the bytes are swapped.
   /// \param x the host-endian value to convert
   /// \returns the value in little-endian byte order
-  @Deprecated('inline')
   int libusb_cpu_to_le16(
     int x,
   ) {
@@ -889,7 +888,6 @@ class Libusb {
   ///
   /// \param transfer a transfer
   /// \returns pointer to the first byte of the data section
-  @Deprecated('inline')
   ffi.Pointer<ffi.Uint8> libusb_control_transfer_get_data(
     ffi.Pointer<libusb_transfer> transfer,
   ) {
@@ -1077,7 +1075,6 @@ class Libusb {
   /// \param callback callback function to be invoked on transfer completion
   /// \param user_data user data to pass to callback function
   /// \param timeout timeout for the transfer in milliseconds
-  @Deprecated('inline')
   void libusb_fill_control_transfer(
     ffi.Pointer<libusb_transfer> transfer,
     ffi.Pointer<libusb_device_handle> dev_handle,
@@ -1113,7 +1110,6 @@ class Libusb {
   /// \param callback callback function to be invoked on transfer completion
   /// \param user_data user data to pass to callback function
   /// \param timeout timeout for the transfer in milliseconds
-  @Deprecated('inline')
   void libusb_fill_bulk_transfer(
     ffi.Pointer<libusb_transfer> transfer,
     ffi.Pointer<libusb_device_handle> dev_handle,
@@ -1156,7 +1152,6 @@ class Libusb {
   /// \param callback callback function to be invoked on transfer completion
   /// \param user_data user data to pass to callback function
   /// \param timeout timeout for the transfer in milliseconds
-  @Deprecated('inline')
   void libusb_fill_bulk_stream_transfer(
     ffi.Pointer<libusb_transfer> transfer,
     ffi.Pointer<libusb_device_handle> dev_handle,
@@ -1239,7 +1234,6 @@ class Libusb {
   /// \param callback callback function to be invoked on transfer completion
   /// \param user_data user data to pass to callback function
   /// \param timeout timeout for the transfer in milliseconds
-  @Deprecated('inline')
   void libusb_fill_iso_transfer(
     ffi.Pointer<libusb_transfer> transfer,
     ffi.Pointer<libusb_device_handle> dev_handle,
@@ -1276,7 +1270,6 @@ class Libusb {
   /// \param transfer a transfer
   /// \param length the length to set in each isochronous packet descriptor
   /// \see libusb_get_max_packet_size()
-  @Deprecated('inline')
   void libusb_set_iso_packet_lengths(
     ffi.Pointer<libusb_transfer> transfer,
     int length,
@@ -1307,7 +1300,6 @@ class Libusb {
   /// \returns the base address of the packet buffer inside the transfer buffer,
   /// or NULL if the packet does not exist.
   /// \see libusb_get_iso_packet_buffer_simple()
-  @Deprecated('inline')
   ffi.Pointer<ffi.Uint8> libusb_get_iso_packet_buffer(
     ffi.Pointer<libusb_transfer> transfer,
     int packet,
@@ -1341,7 +1333,6 @@ class Libusb {
   /// \returns the base address of the packet buffer inside the transfer buffer,
   /// or NULL if the packet does not exist.
   /// \see libusb_get_iso_packet_buffer()
-  @Deprecated('inline')
   ffi.Pointer<ffi.Uint8> libusb_get_iso_packet_buffer_simple(
     ffi.Pointer<libusb_transfer> transfer,
     int packet,
@@ -1442,7 +1433,6 @@ class Libusb {
   /// \param data output buffer for descriptor
   /// \param length size of data buffer
   /// \returns number of bytes returned in data, or LIBUSB_ERROR code on failure
-  @Deprecated('inline')
   int libusb_get_descriptor(
     ffi.Pointer<libusb_device_handle> dev_handle,
     int desc_type,
@@ -1476,7 +1466,6 @@ class Libusb {
   /// \param length size of data buffer
   /// \returns number of bytes returned in data, or LIBUSB_ERROR code on failure
   /// \see libusb_get_string_descriptor_ascii()
-  @Deprecated('inline')
   int libusb_get_string_descriptor(
     ffi.Pointer<libusb_device_handle> dev_handle,
     int desc_index,
@@ -1622,7 +1611,7 @@ class Libusb {
 
   int libusb_wait_for_event(
     ffi.Pointer<libusb_context> ctx,
-    ffi.Pointer<timeval32> tv,
+    ffi.Pointer<timeval> tv,
   ) {
     _libusb_wait_for_event ??= _dylib.lookupFunction<_c_libusb_wait_for_event,
         _dart_libusb_wait_for_event>('libusb_wait_for_event');
@@ -1636,7 +1625,7 @@ class Libusb {
 
   int libusb_handle_events_timeout(
     ffi.Pointer<libusb_context> ctx,
-    ffi.Pointer<timeval32> tv,
+    ffi.Pointer<timeval> tv,
   ) {
     _libusb_handle_events_timeout ??= _dylib.lookupFunction<
         _c_libusb_handle_events_timeout,
@@ -1651,7 +1640,7 @@ class Libusb {
 
   int libusb_handle_events_timeout_completed(
     ffi.Pointer<libusb_context> ctx,
-    ffi.Pointer<timeval32> tv,
+    ffi.Pointer<timeval> tv,
     ffi.Pointer<ffi.Int32> completed,
   ) {
     _libusb_handle_events_timeout_completed ??= _dylib.lookupFunction<
@@ -1697,7 +1686,7 @@ class Libusb {
 
   int libusb_handle_events_locked(
     ffi.Pointer<libusb_context> ctx,
-    ffi.Pointer<timeval32> tv,
+    ffi.Pointer<timeval> tv,
   ) {
     _libusb_handle_events_locked ??= _dylib.lookupFunction<
         _c_libusb_handle_events_locked,
@@ -1725,7 +1714,7 @@ class Libusb {
 
   int libusb_get_next_timeout(
     ffi.Pointer<libusb_context> ctx,
-    ffi.Pointer<timeval32> tv,
+    ffi.Pointer<timeval> tv,
   ) {
     _libusb_get_next_timeout ??= _dylib.lookupFunction<
         _c_libusb_get_next_timeout,
@@ -2843,7 +2832,7 @@ abstract class libusb_log_cb_mode {
   static const int LIBUSB_LOG_CB_CONTEXT = 2;
 }
 
-class timeval32 extends ffi.Struct {
+class timeval extends ffi.Struct {
   @ffi.Int64()
   int tv_sec;
 
@@ -3953,33 +3942,33 @@ typedef _dart_libusb_unlock_event_waiters = void Function(
 
 typedef _c_libusb_wait_for_event = ffi.Int32 Function(
   ffi.Pointer<libusb_context> ctx,
-  ffi.Pointer<timeval32> tv,
+  ffi.Pointer<timeval> tv,
 );
 
 typedef _dart_libusb_wait_for_event = int Function(
   ffi.Pointer<libusb_context> ctx,
-  ffi.Pointer<timeval32> tv,
+  ffi.Pointer<timeval> tv,
 );
 
 typedef _c_libusb_handle_events_timeout = ffi.Int32 Function(
   ffi.Pointer<libusb_context> ctx,
-  ffi.Pointer<timeval32> tv,
+  ffi.Pointer<timeval> tv,
 );
 
 typedef _dart_libusb_handle_events_timeout = int Function(
   ffi.Pointer<libusb_context> ctx,
-  ffi.Pointer<timeval32> tv,
+  ffi.Pointer<timeval> tv,
 );
 
 typedef _c_libusb_handle_events_timeout_completed = ffi.Int32 Function(
   ffi.Pointer<libusb_context> ctx,
-  ffi.Pointer<timeval32> tv,
+  ffi.Pointer<timeval> tv,
   ffi.Pointer<ffi.Int32> completed,
 );
 
 typedef _dart_libusb_handle_events_timeout_completed = int Function(
   ffi.Pointer<libusb_context> ctx,
-  ffi.Pointer<timeval32> tv,
+  ffi.Pointer<timeval> tv,
   ffi.Pointer<ffi.Int32> completed,
 );
 
@@ -4003,12 +3992,12 @@ typedef _dart_libusb_handle_events_completed = int Function(
 
 typedef _c_libusb_handle_events_locked = ffi.Int32 Function(
   ffi.Pointer<libusb_context> ctx,
-  ffi.Pointer<timeval32> tv,
+  ffi.Pointer<timeval> tv,
 );
 
 typedef _dart_libusb_handle_events_locked = int Function(
   ffi.Pointer<libusb_context> ctx,
-  ffi.Pointer<timeval32> tv,
+  ffi.Pointer<timeval> tv,
 );
 
 typedef _c_libusb_pollfds_handle_timeouts = ffi.Int32 Function(
@@ -4021,12 +4010,12 @@ typedef _dart_libusb_pollfds_handle_timeouts = int Function(
 
 typedef _c_libusb_get_next_timeout = ffi.Int32 Function(
   ffi.Pointer<libusb_context> ctx,
-  ffi.Pointer<timeval32> tv,
+  ffi.Pointer<timeval> tv,
 );
 
 typedef _dart_libusb_get_next_timeout = int Function(
   ffi.Pointer<libusb_context> ctx,
-  ffi.Pointer<timeval32> tv,
+  ffi.Pointer<timeval> tv,
 );
 
 typedef _c_libusb_get_pollfds = ffi.Pointer<ffi.Pointer<libusb_pollfd>>
