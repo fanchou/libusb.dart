@@ -1078,7 +1078,7 @@ class Libusb {
 
   int libusb_wait_for_event(
     ffi.Pointer<libusb_context> ctx,
-    ffi.Pointer<timeval32> tv,
+    ffi.Pointer<timeval> tv,
   ) {
     return (_libusb_wait_for_event ??= _dylib.lookupFunction<
         _c_libusb_wait_for_event,
@@ -1092,7 +1092,7 @@ class Libusb {
 
   int libusb_handle_events_timeout(
     ffi.Pointer<libusb_context> ctx,
-    ffi.Pointer<timeval32> tv,
+    ffi.Pointer<timeval> tv,
   ) {
     return (_libusb_handle_events_timeout ??= _dylib.lookupFunction<
         _c_libusb_handle_events_timeout,
@@ -1106,7 +1106,7 @@ class Libusb {
 
   int libusb_handle_events_timeout_completed(
     ffi.Pointer<libusb_context> ctx,
-    ffi.Pointer<timeval32> tv,
+    ffi.Pointer<timeval> tv,
     ffi.Pointer<ffi.Int32> completed,
   ) {
     return (_libusb_handle_events_timeout_completed ??= _dylib.lookupFunction<
@@ -1151,7 +1151,7 @@ class Libusb {
 
   int libusb_handle_events_locked(
     ffi.Pointer<libusb_context> ctx,
-    ffi.Pointer<timeval32> tv,
+    ffi.Pointer<timeval> tv,
   ) {
     return (_libusb_handle_events_locked ??= _dylib.lookupFunction<
         _c_libusb_handle_events_locked,
@@ -1178,7 +1178,7 @@ class Libusb {
 
   int libusb_get_next_timeout(
     ffi.Pointer<libusb_context> ctx,
-    ffi.Pointer<timeval32> tv,
+    ffi.Pointer<timeval> tv,
   ) {
     return (_libusb_get_next_timeout ??= _dylib.lookupFunction<
         _c_libusb_get_next_timeout,
@@ -1255,9 +1255,10 @@ class Libusb {
   /// Since version 1.0.16, \ref LIBUSB_API_VERSION >= 0x01000102
   ///
   /// \param[in] ctx context to register this callback with
-  /// \param[in] events bitwise or of events that will trigger this callback. See \ref
-  /// libusb_hotplug_event
-  /// \param[in] flags hotplug callback flags. See \ref libusb_hotplug_flag
+  /// \param[in] events bitwise or of hotplug events that will trigger this callback.
+  /// See \ref libusb_hotplug_event
+  /// \param[in] flags bitwise or of hotplug flags that affect registration.
+  /// See \ref libusb_hotplug_flag
   /// \param[in] vendor_id the vendor id to match or \ref LIBUSB_HOTPLUG_MATCH_ANY
   /// \param[in] product_id the product id to match or \ref LIBUSB_HOTPLUG_MATCH_ANY
   /// \param[in] dev_class the device class to match or \ref LIBUSB_HOTPLUG_MATCH_ANY
@@ -1319,6 +1320,27 @@ class Libusb {
 
   _dart_libusb_hotplug_deregister_callback? _libusb_hotplug_deregister_callback;
 
+  /// \ingroup libusb_hotplug
+  /// Gets the user_data associated with a hotplug callback.
+  ///
+  /// Since version v1.0.24 \ref LIBUSB_API_VERSION >= 0x01000108
+  ///
+  /// \param[in] ctx context this callback is registered with
+  /// \param[in] callback_handle the handle of the callback to get the user_data of
+  ffi.Pointer<ffi.Void> libusb_hotplug_get_user_data(
+    ffi.Pointer<libusb_context> ctx,
+    int callback_handle,
+  ) {
+    return (_libusb_hotplug_get_user_data ??= _dylib.lookupFunction<
+        _c_libusb_hotplug_get_user_data,
+        _dart_libusb_hotplug_get_user_data>('libusb_hotplug_get_user_data'))(
+      ctx,
+      callback_handle,
+    );
+  }
+
+  _dart_libusb_hotplug_get_user_data? _libusb_hotplug_get_user_data;
+
   int libusb_set_option(
     ffi.Pointer<libusb_context> ctx,
     int option,
@@ -1354,12 +1376,12 @@ abstract class libusb_class_code {
   /// Physical
   static const int LIBUSB_CLASS_PHYSICAL = 5;
 
+  /// Image class
+  static const int LIBUSB_CLASS_IMAGE = 6;
+  static const int LIBUSB_CLASS_PTP = 6;
+
   /// Printer class
   static const int LIBUSB_CLASS_PRINTER = 7;
-
-  /// Image class
-  static const int LIBUSB_CLASS_PTP = 6;
-  static const int LIBUSB_CLASS_IMAGE = 6;
 
   /// Mass storage class
   static const int LIBUSB_CLASS_MASS_STORAGE = 8;
@@ -1387,6 +1409,9 @@ abstract class libusb_class_code {
 
   /// Wireless class
   static const int LIBUSB_CLASS_WIRELESS = 224;
+
+  /// Miscellaneous class
+  static const int LIBUSB_CLASS_MISCELLANEOUS = 239;
 
   /// Application class
   static const int LIBUSB_CLASS_APPLICATION = 254;
@@ -1442,31 +1467,28 @@ abstract class libusb_descriptor_type {
 /// Endpoint direction. Values for bit 7 of the
 /// \ref libusb_endpoint_descriptor::bEndpointAddress "endpoint address" scheme.
 abstract class libusb_endpoint_direction {
-  /// In: device-to-host
-  static const int LIBUSB_ENDPOINT_IN = 128;
-
   /// Out: host-to-device
   static const int LIBUSB_ENDPOINT_OUT = 0;
+
+  /// In: device-to-host
+  static const int LIBUSB_ENDPOINT_IN = 128;
 }
 
 /// \ingroup libusb_desc
 /// Endpoint transfer type. Values for bits 0:1 of the
 /// \ref libusb_endpoint_descriptor::bmAttributes "endpoint attributes" field.
-abstract class libusb_transfer_type {
+abstract class libusb_endpoint_transfer_type {
   /// Control endpoint
-  static const int LIBUSB_TRANSFER_TYPE_CONTROL = 0;
+  static const int LIBUSB_ENDPOINT_TRANSFER_TYPE_CONTROL = 0;
 
   /// Isochronous endpoint
-  static const int LIBUSB_TRANSFER_TYPE_ISOCHRONOUS = 1;
+  static const int LIBUSB_ENDPOINT_TRANSFER_TYPE_ISOCHRONOUS = 1;
 
   /// Bulk endpoint
-  static const int LIBUSB_TRANSFER_TYPE_BULK = 2;
+  static const int LIBUSB_ENDPOINT_TRANSFER_TYPE_BULK = 2;
 
   /// Interrupt endpoint
-  static const int LIBUSB_TRANSFER_TYPE_INTERRUPT = 3;
-
-  /// Stream endpoint
-  static const int LIBUSB_TRANSFER_TYPE_BULK_STREAM = 4;
+  static const int LIBUSB_ENDPOINT_TRANSFER_TYPE_INTERRUPT = 3;
 }
 
 /// \ingroup libusb_misc
@@ -1583,6 +1605,57 @@ abstract class libusb_iso_usage_type {
 }
 
 /// \ingroup libusb_desc
+/// Supported speeds (wSpeedSupported) bitfield. Indicates what
+/// speeds the device supports.
+abstract class libusb_supported_speed {
+  /// Low speed operation supported (1.5MBit/s).
+  static const int LIBUSB_LOW_SPEED_OPERATION = 1;
+
+  /// Full speed operation supported (12MBit/s).
+  static const int LIBUSB_FULL_SPEED_OPERATION = 2;
+
+  /// High speed operation supported (480MBit/s).
+  static const int LIBUSB_HIGH_SPEED_OPERATION = 4;
+
+  /// Superspeed operation supported (5000MBit/s).
+  static const int LIBUSB_SUPER_SPEED_OPERATION = 8;
+}
+
+/// \ingroup libusb_desc
+/// Masks for the bits of the
+/// \ref libusb_usb_2_0_extension_descriptor::bmAttributes "bmAttributes" field
+/// of the USB 2.0 Extension descriptor.
+abstract class libusb_usb_2_0_extension_attributes {
+  /// Supports Link Power Management (LPM)
+  static const int LIBUSB_BM_LPM_SUPPORT = 2;
+}
+
+/// \ingroup libusb_desc
+/// Masks for the bits of the
+/// \ref libusb_ss_usb_device_capability_descriptor::bmAttributes "bmAttributes" field
+/// field of the SuperSpeed USB Device Capability descriptor.
+abstract class libusb_ss_usb_device_capability_attributes {
+  /// Supports Latency Tolerance Messages (LTM)
+  static const int LIBUSB_BM_LTM_SUPPORT = 2;
+}
+
+/// \ingroup libusb_desc
+/// USB capability types
+abstract class libusb_bos_type {
+  /// Wireless USB device capability
+  static const int LIBUSB_BT_WIRELESS_USB_DEVICE_CAPABILITY = 1;
+
+  /// USB 2.0 extensions
+  static const int LIBUSB_BT_USB_2_0_EXTENSION = 2;
+
+  /// SuperSpeed USB device capability
+  static const int LIBUSB_BT_SS_USB_DEVICE_CAPABILITY = 3;
+
+  /// Container ID type
+  static const int LIBUSB_BT_CONTAINER_ID = 4;
+}
+
+/// \ingroup libusb_desc
 /// A structure representing the standard USB device descriptor. This
 /// descriptor is documented in section 9.6.1 of the USB 3.0 specification.
 /// All multiple-byte fields are represented in host-endian format.
@@ -1672,8 +1745,8 @@ class libusb_endpoint_descriptor extends ffi.Struct {
 
   /// Attributes which apply to the endpoint when it is configured using
   /// the bConfigurationValue. Bits 0:1 determine the transfer type and
-  /// correspond to \ref libusb_transfer_type. Bits 2:3 are only used for
-  /// isochronous endpoints and correspond to \ref libusb_iso_sync_type.
+  /// correspond to \ref libusb_endpoint_transfer_type. Bits 2:3 are only used
+  /// for isochronous endpoints and correspond to \ref libusb_iso_sync_type.
   /// Bits 4:5 are also only used for isochronous endpoints and correspond to
   /// \ref libusb_iso_usage_type. Bits 6:7 are reserved.
   @ffi.Uint8()
@@ -1853,15 +1926,15 @@ class libusb_ss_endpoint_companion_descriptor extends ffi.Struct {
   @ffi.Uint8()
   external int bMaxBurst;
 
-  /// In bulk EP:	bits 4:0 represents the	maximum	number of
-  /// streams the	EP supports. In	isochronous EP:	bits 1:0
-  /// represents the Mult	- a zero based value that determines
-  /// the	maximum	number of packets within a service interval
+  /// In bulk EP: bits 4:0 represents the maximum number of
+  /// streams the EP supports. In isochronous EP: bits 1:0
+  /// represents the Mult - a zero based value that determines
+  /// the maximum number of packets within a service interval
   @ffi.Uint8()
   external int bmAttributes;
 
-  /// The	total number of bytes this EP will transfer every
-  /// service interval. valid only for periodic EPs.
+  /// The total number of bytes this EP will transfer every
+  /// service interval. Valid only for periodic EPs.
   @ffi.Uint16()
   external int wBytesPerInterval;
 }
@@ -1962,8 +2035,6 @@ class libusb_ss_usb_device_capability_descriptor extends ffi.Struct {
 /// All multiple-byte fields, except UUIDs, are represented in host-endian format.
 class libusb_container_id_descriptor extends ffi.Opaque {}
 
-/// \ingroup libusb_asyncio
-/// Setup packet for control transfers.
 class libusb_control_setup extends ffi.Struct {
   /// Request type. Bits 0:4 determine recipient, see
   /// \ref libusb_request_recipient. Bits 5:6 determine type, see
@@ -2048,57 +2119,6 @@ abstract class libusb_speed {
   static const int LIBUSB_SPEED_SUPER_PLUS = 5;
 }
 
-/// \ingroup libusb_dev
-/// Supported speeds (wSpeedSupported) bitfield. Indicates what
-/// speeds the device supports.
-abstract class libusb_supported_speed {
-  /// Low speed operation supported (1.5MBit/s).
-  static const int LIBUSB_LOW_SPEED_OPERATION = 1;
-
-  /// Full speed operation supported (12MBit/s).
-  static const int LIBUSB_FULL_SPEED_OPERATION = 2;
-
-  /// High speed operation supported (480MBit/s).
-  static const int LIBUSB_HIGH_SPEED_OPERATION = 4;
-
-  /// Superspeed operation supported (5000MBit/s).
-  static const int LIBUSB_SUPER_SPEED_OPERATION = 8;
-}
-
-/// \ingroup libusb_dev
-/// Masks for the bits of the
-/// \ref libusb_usb_2_0_extension_descriptor::bmAttributes "bmAttributes" field
-/// of the USB 2.0 Extension descriptor.
-abstract class libusb_usb_2_0_extension_attributes {
-  /// Supports Link Power Management (LPM)
-  static const int LIBUSB_BM_LPM_SUPPORT = 2;
-}
-
-/// \ingroup libusb_dev
-/// Masks for the bits of the
-/// \ref libusb_ss_usb_device_capability_descriptor::bmAttributes "bmAttributes" field
-/// field of the SuperSpeed USB Device Capability descriptor.
-abstract class libusb_ss_usb_device_capability_attributes {
-  /// Supports Latency Tolerance Messages (LTM)
-  static const int LIBUSB_BM_LTM_SUPPORT = 2;
-}
-
-/// \ingroup libusb_dev
-/// USB capability types
-abstract class libusb_bos_type {
-  /// Wireless USB device capability
-  static const int LIBUSB_BT_WIRELESS_USB_DEVICE_CAPABILITY = 1;
-
-  /// USB 2.0 extensions
-  static const int LIBUSB_BT_USB_2_0_EXTENSION = 2;
-
-  /// SuperSpeed USB device capability
-  static const int LIBUSB_BT_SS_USB_DEVICE_CAPABILITY = 3;
-
-  /// Container ID type
-  static const int LIBUSB_BT_CONTAINER_ID = 4;
-}
-
 /// \ingroup libusb_misc
 /// Error codes. Most libusb functions return 0 on success or one of these
 /// codes on failure.
@@ -2147,6 +2167,25 @@ abstract class libusb_error {
 
   /// Other error
   static const int LIBUSB_ERROR_OTHER = -99;
+}
+
+/// \ingroup libusb_asyncio
+/// Transfer type
+abstract class libusb_transfer_type {
+  /// Control transfer
+  static const int LIBUSB_TRANSFER_TYPE_CONTROL = 0;
+
+  /// Isochronous transfer
+  static const int LIBUSB_TRANSFER_TYPE_ISOCHRONOUS = 1;
+
+  /// Bulk transfer
+  static const int LIBUSB_TRANSFER_TYPE_BULK = 2;
+
+  /// Interrupt transfer
+  static const int LIBUSB_TRANSFER_TYPE_INTERRUPT = 3;
+
+  /// Bulk stream transfer
+  static const int LIBUSB_TRANSFER_TYPE_BULK_STREAM = 4;
 }
 
 /// \ingroup libusb_asyncio
@@ -2266,16 +2305,20 @@ abstract class libusb_capability {
 
 /// \ingroup libusb_lib
 /// Log message levels.
-/// - LIBUSB_LOG_LEVEL_NONE (0)    : no messages ever printed by the library (default)
-/// - LIBUSB_LOG_LEVEL_ERROR (1)   : error messages are printed to stderr
-/// - LIBUSB_LOG_LEVEL_WARNING (2) : warning and error messages are printed to stderr
-/// - LIBUSB_LOG_LEVEL_INFO (3)    : informational messages are printed to stderr
-/// - LIBUSB_LOG_LEVEL_DEBUG (4)   : debug and informational messages are printed to stderr
 abstract class libusb_log_level {
+  /// (0) : No messages ever emitted by the library (default)
   static const int LIBUSB_LOG_LEVEL_NONE = 0;
+
+  /// (1) : Error messages are emitted
   static const int LIBUSB_LOG_LEVEL_ERROR = 1;
+
+  /// (2) : Warning and error messages are emitted
   static const int LIBUSB_LOG_LEVEL_WARNING = 2;
+
+  /// (3) : Informational, warning and error messages are emitted
   static const int LIBUSB_LOG_LEVEL_INFO = 3;
+
+  /// (4) : All messages are emitted
   static const int LIBUSB_LOG_LEVEL_DEBUG = 4;
 }
 
@@ -2283,14 +2326,14 @@ abstract class libusb_log_level {
 /// Log callback mode.
 /// \see libusb_set_log_cb()
 abstract class libusb_log_cb_mode {
-  /// Callback function handling all log mesages.
+  /// Callback function handling all log messages.
   static const int LIBUSB_LOG_CB_GLOBAL = 1;
 
-  /// Callback function handling context related log mesages.
+  /// Callback function handling context related log messages.
   static const int LIBUSB_LOG_CB_CONTEXT = 2;
 }
 
-class timeval32 extends ffi.Struct {
+class timeval extends ffi.Struct {
   @ffi.Int64()
   external int tv_sec;
 
@@ -2317,19 +2360,6 @@ class libusb_pollfd extends ffi.Struct {
 ///
 /// Since version 1.0.16, \ref LIBUSB_API_VERSION >= 0x01000102
 ///
-/// Flags for hotplug events
-abstract class libusb_hotplug_flag {
-  /// Default value when not using any flags.
-  static const int LIBUSB_HOTPLUG_NO_FLAGS = 0;
-
-  /// Arm the callback and fire it for all matching currently attached devices.
-  static const int LIBUSB_HOTPLUG_ENUMERATE = 1;
-}
-
-/// \ingroup libusb_hotplug
-///
-/// Since version 1.0.16, \ref LIBUSB_API_VERSION >= 0x01000102
-///
 /// Hotplug events
 abstract class libusb_hotplug_event {
   /// A device has been plugged in and is ready to use
@@ -2339,6 +2369,16 @@ abstract class libusb_hotplug_event {
   /// It is the user's responsibility to call libusb_close on any handle associated with a disconnected device.
   /// It is safe to call libusb_get_device_descriptor on a device that has left
   static const int LIBUSB_HOTPLUG_EVENT_DEVICE_LEFT = 2;
+}
+
+/// \ingroup libusb_hotplug
+///
+/// Since version 1.0.16, \ref LIBUSB_API_VERSION >= 0x01000102
+///
+/// Hotplug flags
+abstract class libusb_hotplug_flag {
+  /// Arm the callback and fire it for all matching currently attached devices.
+  static const int LIBUSB_HOTPLUG_ENUMERATE = 1;
 }
 
 /// \ingroup libusb_lib
@@ -2373,13 +2413,23 @@ abstract class libusb_option {
   ///
   /// Only valid on Windows.
   static const int LIBUSB_OPTION_USE_USBDK = 1;
+
+  /// Set libusb has weak authority. With this option, libusb will skip
+  /// scan devices in libusb_init.
+  ///
+  /// This option should be set before calling libusb_init(), otherwise
+  /// libusb_init will failed. Normally libusb_wrap_sys_device need set
+  /// this option.
+  ///
+  /// Only valid on Linux-based operating system, such as Android.
+  static const int LIBUSB_OPTION_WEAK_AUTHORITY = 2;
 }
 
 const int ZERO_SIZED_ARRAY = 0;
 
-const int LIBUSB_API_VERSION = 16777479;
+const int LIBUSB_API_VERSION = 16777480;
 
-const int LIBUSBX_API_VERSION = 16777479;
+const int LIBUSBX_API_VERSION = 16777480;
 
 const int LIBUSB_DT_DEVICE_SIZE = 18;
 
@@ -2420,6 +2470,8 @@ const int LIBUSB_ISO_USAGE_TYPE_MASK = 48;
 const int LIBUSB_CONTROL_SETUP_SIZE = 8;
 
 const int LIBUSB_ERROR_COUNT = 14;
+
+const int LIBUSB_HOTPLUG_NO_FLAGS = 0;
 
 const int LIBUSB_HOTPLUG_MATCH_ANY = -1;
 
@@ -3177,33 +3229,33 @@ typedef _dart_libusb_unlock_event_waiters = void Function(
 
 typedef _c_libusb_wait_for_event = ffi.Int32 Function(
   ffi.Pointer<libusb_context> ctx,
-  ffi.Pointer<timeval32> tv,
+  ffi.Pointer<timeval> tv,
 );
 
 typedef _dart_libusb_wait_for_event = int Function(
   ffi.Pointer<libusb_context> ctx,
-  ffi.Pointer<timeval32> tv,
+  ffi.Pointer<timeval> tv,
 );
 
 typedef _c_libusb_handle_events_timeout = ffi.Int32 Function(
   ffi.Pointer<libusb_context> ctx,
-  ffi.Pointer<timeval32> tv,
+  ffi.Pointer<timeval> tv,
 );
 
 typedef _dart_libusb_handle_events_timeout = int Function(
   ffi.Pointer<libusb_context> ctx,
-  ffi.Pointer<timeval32> tv,
+  ffi.Pointer<timeval> tv,
 );
 
 typedef _c_libusb_handle_events_timeout_completed = ffi.Int32 Function(
   ffi.Pointer<libusb_context> ctx,
-  ffi.Pointer<timeval32> tv,
+  ffi.Pointer<timeval> tv,
   ffi.Pointer<ffi.Int32> completed,
 );
 
 typedef _dart_libusb_handle_events_timeout_completed = int Function(
   ffi.Pointer<libusb_context> ctx,
-  ffi.Pointer<timeval32> tv,
+  ffi.Pointer<timeval> tv,
   ffi.Pointer<ffi.Int32> completed,
 );
 
@@ -3227,12 +3279,12 @@ typedef _dart_libusb_handle_events_completed = int Function(
 
 typedef _c_libusb_handle_events_locked = ffi.Int32 Function(
   ffi.Pointer<libusb_context> ctx,
-  ffi.Pointer<timeval32> tv,
+  ffi.Pointer<timeval> tv,
 );
 
 typedef _dart_libusb_handle_events_locked = int Function(
   ffi.Pointer<libusb_context> ctx,
-  ffi.Pointer<timeval32> tv,
+  ffi.Pointer<timeval> tv,
 );
 
 typedef _c_libusb_pollfds_handle_timeouts = ffi.Int32 Function(
@@ -3245,12 +3297,12 @@ typedef _dart_libusb_pollfds_handle_timeouts = int Function(
 
 typedef _c_libusb_get_next_timeout = ffi.Int32 Function(
   ffi.Pointer<libusb_context> ctx,
-  ffi.Pointer<timeval32> tv,
+  ffi.Pointer<timeval> tv,
 );
 
 typedef _dart_libusb_get_next_timeout = int Function(
   ffi.Pointer<libusb_context> ctx,
-  ffi.Pointer<timeval32> tv,
+  ffi.Pointer<timeval> tv,
 );
 
 typedef _c_libusb_get_pollfds = ffi.Pointer<ffi.Pointer<libusb_pollfd>>
@@ -3333,6 +3385,16 @@ typedef _c_libusb_hotplug_deregister_callback = ffi.Void Function(
 );
 
 typedef _dart_libusb_hotplug_deregister_callback = void Function(
+  ffi.Pointer<libusb_context> ctx,
+  int callback_handle,
+);
+
+typedef _c_libusb_hotplug_get_user_data = ffi.Pointer<ffi.Void> Function(
+  ffi.Pointer<libusb_context> ctx,
+  ffi.Int32 callback_handle,
+);
+
+typedef _dart_libusb_hotplug_get_user_data = ffi.Pointer<ffi.Void> Function(
   ffi.Pointer<libusb_context> ctx,
   int callback_handle,
 );
